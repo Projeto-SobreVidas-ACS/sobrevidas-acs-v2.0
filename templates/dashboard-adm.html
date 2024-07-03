@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="initial-scale=1, width=device-width">
+  	
+	<link rel="stylesheet"  href="../public/static/css/global.css" />
+  	<link rel="stylesheet"  href="../public/static/css/dashboard-acs.css" />
+  	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Josefin Sans:wght@400&display=swap" />
+  	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open Sans:wght@400;700;800&display=swap" />
+</head>
+<body>
+	<header> 
+		<div class="logo">
+			<a href="dashboard-acs.html"><img class="icone" alt="Ícone do SobreVidas ACS" src="../public/assets/images/icone.png"></a>
+        	<h1 class="titulo">SobreVidas ACS</h1>
+		</div>
+		<div class="menu">
+			<a class="link" href=""><p class="contato">Contato ▽</p></a>
+			<a class="link" href=""><p class="duvidas">Duvidas ▽</p></a>
+			<a class="notificacoes" href=""><img class="notificacoes-icon" alt="" src="../public/assets/images/icone-notificacao.png"></a>
+			<a class="perfil" href=""><img class="icone-perfil" alt="" src="../public/assets/images/icone-perfil.png"></a>
+		</div>
+    </header>
+
+	<main>
+		<h1 class="adm">Página de Administrador</h1>
+		<div class="sessao-cadastro">
+            
+			<img class="desenho" src="../public/assets/images/desenho.png" alt="">
+			<div class="funcionalidades">
+                <a href="cadastro-acs.html" class="btn-cadastrar">CADASTRAR ACS/USUÁRIO</a>
+                <a href="lista-de-cadastros-acs.html" class="btn-cadastros">CADASTROS ACS's/USUÁRIOS</a>
+				<a href="cadastro-paciente.html" class="btn-cadastrar">CADASTRAR PACIENTE</a>
+				<a href="lista-de-cadastros.html" class="btn-cadastros">CADASTROS PACIENTES</a>
+                <a href="lista-de-consultas.html" class="btn-encaminhamentos">CONSULTAS PARA MARCAR</a>
+			</div>
+		</div>
+
+		<div class="metricas">
+			<h2>Dashboard</h2>
+			<input type="month" id="mesAno" name="mesAno">	
+			<input type="submit" value="Selecionar">
+			<div class="dados-visitas">
+				<div class="info">
+					<p class="numero">50</p>
+					<p class="legenda">Total de Visitas Realizadas</p>
+				</div>
+				<div class="info">
+					<p class="numero">50</p>
+					<p class="legenda">Consultas Marcadas</p>
+				</div>
+				<div class="info">
+					<p class="numero">50</p>
+					<p class="legenda">Absenteísmo em Consultas</p>
+				</div>
+				<div class="info">
+					<p class="numero">50</p>
+					<p class="legenda">Baixa Prioridade (um fator)</p>
+				</div>
+				<div class="info">
+					<p class="numero">50</p>
+					<p class="legenda">Média Prioridade (dois fatores)</p>
+				</div>
+				<div class="info">
+					<p class="numero">50</p>
+					<p class="legenda">Alta Prioridade (três ou mais)</p>
+				</div>
+			</div>
+            <a href="" class="btn-encaminhamentos">SALVAR PDF RELATÓRIO</a>
+		</div>
+	</main>
+	<footer class="rodape">
+        <p class="join">Junte-se a essa jornada!</p>
+        <p class="apoio">Juntos, podemos espalhar sorrisos e conscientização, combatendo o câncer de boca um passo de cada vez.</p>
+        <p class="copyright">© 2024 Copyright - Sobre Vidas ACS</p>
+    </footer>
+</body>
+</html>

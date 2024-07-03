@@ -68,6 +68,13 @@ header {
     object-fit: cover;
 }
 
+.adm {
+    width: 100vw;
+    color: #fbfbfb;
+    background-color: #394744;
+    text-align: center;
+}
+
 .sessao-cadastro {
     width: 100%;
     position: relative;
@@ -105,12 +112,14 @@ header {
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
     border-radius: 50px;
     background-color: #566f6b;
+    color: #fbfbfb;
     width: 370px;
     height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 10px;
+    font-weight: 600;
 }
 .btn-cadastros {
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
