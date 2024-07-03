@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
+
+body {
+    background: linear-gradient(180deg, #fff, #c8fdf5 49%, #fff 99.99%);
+}
+header {
+    position: relative;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 115px;
+    overflow: hidden;
+    align-items: center;
+    display: flex;
+}
+
+.icone {
+    margin: 15px 20px 15px 25px;
+    width: 85px;
+    height: 85px;
+    object-fit: cover;
+}
+.titulo {
+    padding-top: 20px;
+    font-size: 36px;
+    font-family: 'Josefin Sans';
+    color: #1d2830;
+}
+
+main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+    place-items: center;
+    margin: 10px 70px;
+}
+
+.foto-tela-login {
+    width: 500px;
+    height: 400px;
+    object-fit: cover;
+}
+
+.formulario-de-login{
+    width: 500px;
+    height: fit-content;
+    background-color: #fdfdfd;
+    padding: 50px 55px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 30px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+.texto-entrar {
+    font-size: 48px;
+    line-height: 48px;
+    display: inline-block;
+    color: #566f6b;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.formulario-de-login label {
+    font-size: 18px;
+    line-height: 24px;
+    color: #394744;
+    text-align: left;
+    margin-top: 20px;
+}
+.formulario-de-login input {
+    font-size: 18px;
+    appearance: none;
+    border-radius: 6px;
+    background-color: rgba(217, 217, 217, 0.5);
+    height: 45px;
+    overflow: hidden;
+    border: none;
+    outline: none;
+    padding-left: 20px;
+
+}
+
+.formulario-de-login button {
+    margin: auto;
+    width: 200px;
+    padding: 10px;
+    font-size: 20px;
+    color: #ffffff;
+    box-shadow: 0px 4px 2px rgba(0, 0, 0, 0.1);
+    border-radius: 50px;
+    background-color: #5bada0;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.formulario-de-login a {
+    text-decoration: underline;
+    margin: auto;
+    margin-top: 20px;
+}
+.formulario-de-login a:hover {
+    color: #5bada0;
+}
+
+.rodape {
+    width: 100%;
+    margin-top: 100px;
+    background-color:#394744;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    font-family: 'Josefin Sans';
+}
+.join {
+    font-size: 18px;
+}
+.apoio {
+    font-weight: 300;
+    margin-bottom: 25px;
+}
+
+@media (max-width: 555px) {
+    main {
+      margin: 0px;
+      padding: 0px;
+    }
+    .titulo {
+        font-size: 24px;
+    }
+    .formulario-de-login {
+        width: 90%;
+    }
+}
+
+@media (max-width: 1070px) {
+    main {
+      margin: 10px;
+    }
+}
+@media (max-width: 880px) {
+    main {
+      grid-template-columns: 1fr;
+    }
+}

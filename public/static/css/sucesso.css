@@ -1,0 +1,157 @@
+
+header {
+    position: relative;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100px;
+    overflow: hidden;
+    align-items: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background-color: #fdfdfd;
+}
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.icone {
+    margin: 15px 20px 15px 25px;
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+}
+.titulo {
+    padding-top: 10px;
+    font-size: 28px;
+    font-family: 'Josefin Sans';
+    color: #1d2830;
+}
+
+.menu {
+    position: relative;
+    left: 0px;
+    height: 100px;
+    overflow: hidden;
+    text-align: center;
+    font-size: 16px;
+    color: #000;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+.link {
+    margin-right: 30px;
+}
+.notificacoes-icon {
+    margin: 5px;
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+}
+
+.perfil {
+    justify-content: center;
+    align-items: center;
+    margin: 15px;
+    width: 70px;
+    height: 70px;
+    
+}
+.icone-perfil {
+    margin: 10px;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+main {
+    background: linear-gradient(180deg, #fbfbfb, rgba(255, 255, 255, 0.73) 28.5%, rgba(249, 249, 249, 0.4) 64%, rgba(91, 173, 160, 0.47));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+}
+.mensagem-sucesso {
+    width: 500px;
+    height: fit-content;
+    background-color: #fdfdfd;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 30px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    align-items: center;
+    justify-content: center;
+}
+
+.mensagem-sucesso h2 {
+    color: #566F6B;
+    font-size: 36px;
+    text-align: center;
+}
+.mensagem-sucesso p {
+    margin: 20px 0px;
+    text-align: center;
+    font-weight: 100;
+    font-size: 14px;
+    color: #35414B;
+}
+
+.botaovoltar {
+    width: 200px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 20px;
+    color: #ffffff;
+    box-shadow: 0px 4px 2px rgba(0, 0, 0, 0.1);
+    border-radius: 50px;
+    background-color: #5bada0;
+    text-align: center;
+    justify-content: center;
+}
+.btn-novo-cadastro {
+    margin: 20px;
+    width: 200px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 20px;
+    color: #ffffff;
+    box-shadow: 0px 4px 2px rgba(0, 0, 0, 0.1);
+    border-radius: 50px;
+    background-color:#394744;
+    text-align: center;
+}
+
+
+
+.rodape {
+    width: 100%;
+    background-color:#394744;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    font-family: 'Josefin Sans';
+}
+.join {
+    font-size: 18px;
+}
+.apoio {
+    font-weight: 300;
+    margin-bottom: 25px;
+}
+
+
+
+@media (max-width: 760px) {
+    header {
+      grid-template-columns: 1fr;
+      height: 200px;
+      box-shadow: 0px 4px 2px rgba(0, 0, 0, 0.1);
+    }
+    .menu {
+        justify-content: center;
+        margin-left: 20px;
+    }
+}

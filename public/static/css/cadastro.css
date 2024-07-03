@@ -1,0 +1,328 @@
+header {
+    position: relative;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100px;
+    overflow: hidden;
+    align-items: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background-color: #fdfdfd;
+}
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.icone {
+    margin: 15px 20px 15px 25px;
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+}
+.titulo {
+    padding-top: 10px;
+    font-size: 28px;
+    font-family: 'Josefin Sans';
+    color: #1d2830;
+}
+
+.menu {
+    position: relative;
+    left: 0px;
+    height: 100px;
+    overflow: hidden;
+    text-align: center;
+    font-size: 16px;
+    color: #000;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+.link {
+    margin-right: 30px;
+}
+.notificacoes-icon {
+    margin: 5px;
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+}
+
+.perfil {
+    justify-content: center;
+    align-items: center;
+    margin: 15px;
+    width: 70px;
+    height: 70px;
+    
+}
+.icone-perfil {
+    margin: 10px;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+main {
+    background-color: #708985;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding-top: 50px;
+}
+
+.cadastro {
+    color: #fdfdfd;
+    font-size: 36px;
+}
+.instru {
+    text-align: center;
+    font-weight: 100;
+    font-size: 14px;
+    color: #bbcac8;
+    width: 70%;
+}
+
+.formulario-paciente{
+    height: fit-content;
+    padding: 50px 0px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 70px;
+}
+.coluna {
+    margin: auto;
+    flex: 1;
+    min-width: 450px;
+    max-width: 450px;
+}
+
+.coluna label {
+    width: 450px;
+    font-size: 18px;
+    line-height: 24px;
+    text-align: left;
+    margin-top: 20px;
+}
+.coluna input {
+    width: 450px;
+    font-size: 18px;
+    appearance: none;
+    border-radius: 6px;
+    background-color: rgb(217, 217, 217);
+    height: 45px;
+    overflow: hidden;
+    border: none;
+    outline: none;
+    padding: 0px 20px;
+    color: #1d2830;
+    margin-bottom: 15px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.menor {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.menor div {
+    flex: 1;
+    width: 50%;
+    
+}
+.menor input {
+    width: 220px;
+}
+
+.menor1 {
+    display: flex;
+    flex-wrap: wrap;
+}
+.menor1 div {
+    flex: 1;
+}
+.menor1 input {
+    width: 230px;
+    margin-right: 20px;
+}
+.tipo {
+    width: 450px;
+    font-size: 18px;
+    border-radius: 6px;
+    background-color: rgb(217, 217, 217);
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    height: 45px;
+    overflow: hidden;
+    border: none;
+    outline: none;
+    padding: 0px 20px;
+    color: #1d2830;
+    margin-bottom: 20px;
+}
+
+.menor1 select {
+    width: 200px;
+    font-size: 18px;
+    border-radius: 6px;
+    background-color: rgb(217, 217, 217);
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    height: 45px;
+    overflow: hidden;
+    border: none;
+    outline: none;
+    padding: 0px 20px;
+    color: #1d2830;
+    margin-bottom: 15px;
+}
+
+.botoes {
+    margin-top: 0px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.formulario-paciente button {
+    width: 200px;
+    height: 40px;
+    padding: 10px;
+    font-size: 20px;
+    color: #ffffff;
+    box-shadow: 0px 4px 2px rgba(0, 0, 0, 0.1);
+    border-radius: 50px;
+    background-color: #5bada0;
+    text-align: center;
+    
+}
+
+.botaovoltar {
+    height: 40px;
+    padding: 5px;
+    font-size: 20px;
+    color: #ffffff;
+    box-shadow: 0px 4px 2px rgba(0, 0, 0, 0.1);
+    border-radius: 50px;
+    background-color: #F26B59;
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+}
+
+
+
+/* controle de risco */
+.coluna-risco {
+    flex: 1;
+    min-width: 450px;
+    max-width: 450px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.coluna-risco h2 {
+    font-size: 28px;
+}
+.coluna-risco div {
+    height: 60px;
+}
+.coluna-risco label {
+    font-size: 20px;
+    margin-top: 30px;
+}
+.radio-container label {
+    margin: 0 auto;
+    padding-right: 20px;
+}
+input[type="radio"] {
+    appearance: none;
+    width: 20px; /* Largura maior */
+    height: 20px; /* Altura maior */
+    background-color: #708985; /* Cor verde ciano */
+    border: 2px solid #1d2830; /* Borda verde ciano escuro */
+    border-radius: 4px; /* Mais quadrada */
+    cursor: pointer;
+    margin-right: 10px;
+    position: relative;
+  }
+  
+  input[type="radio"]:checked::before {
+    content: "";
+    width: 12px; /* Tamanho do ponto interno */
+    height: 12px; /* Tamanho do ponto interno */
+    background-color: black; /* Cor do ponto interno */
+    border-radius: 2px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+
+
+.rodape {
+    width: 100%;
+    background-color:#394744;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    font-family: 'Josefin Sans';
+}
+.join {
+    font-size: 18px;
+}
+.apoio {
+    font-weight: 300;
+    margin-bottom: 25px;
+}
+
+@media (max-width: 760px) {
+    header {
+      grid-template-columns: 1fr;
+      height: 200px;
+      box-shadow: 0px 4px 2px rgba(0, 0, 0, 0.1);
+    }
+    .menu {
+        justify-content: center;
+        margin-left: 20px;
+    }
+}
+@media (max-width: 500px) {
+    .coluna-risco {
+        flex: 1;
+        min-width: 350px;
+        max-width: 350px;
+        margin: 0 auto;
+    }
+    .coluna {
+        margin: auto;
+        flex: 1;
+        min-width: 350px;
+        max-width: 350px;
+    }
+    
+    .coluna label {
+        width: 350px;
+        font-size: 16px;
+        line-height: 24px;
+        text-align: left;
+        margin-top: 20px;
+    }
+    .coluna input {
+        width: 350px;
+        font-size: 18px;
+        appearance: none;
+        border-radius: 6px;
+        background-color: rgb(217, 217, 217);
+        height: 45px;
+        overflow: hidden;
+        border: none;
+        outline: none;
+        padding: 0px 20px;
+        color: #1d2830;
+        margin-bottom: 15px;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    }
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"  href="../public/static/css/index.css" />
+  	<link rel="stylesheet"  href="../public/static/css/global.css" />
+    <title>SobreVidas ACS</title>
+</head>
+<body>
+    <header> 
+        <img class="icone" alt="Ícone do SobreVidas ACS" src="../public/assets/images/icone.png">
+        <h1 class="titulo">SobreVidas ACS</h1>
+    </header>
+    <main>
+        <img class="foto-tela-login" alt="Tela de Login" src="../public/assets/images/foto-tela-login.png">
+        <form class="formulario-de-login" action="/login" method="post">
+            <h2 class="texto-entrar">Área de acesso</h2>
+            <label for="username">Usuário:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Senha:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Entrar</button>
+
+            
+            <a href="/forgot-password">Esqueceu a senha?</a>
+            <a href="templates/dashboard-acs.html">porta temporaria</a>
+        </form>
+    </main>
+    <footer class="rodape">
+        <p class="join">Junte-se a essa jornada!</p>
+        <p class="apoio">Juntos, podemos espalhar sorrisos e conscientização, combatendo o câncer de boca um passo de cada vez.</p>
+        <p class="copyright">© 2024 Copyright - Sobre Vidas ACS</p>
+    </footer>
+</body>
+</html>
