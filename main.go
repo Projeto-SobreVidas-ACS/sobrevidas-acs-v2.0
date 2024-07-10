@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/gorilla/sessions"
+
 	_ "github.com/lib/pq"
 )
 
@@ -62,6 +64,11 @@ type Usuario struct {
 	TipoUsuario    int
 }
 
+var (
+	key   = []byte("PhaFjVgy4TioRUpPNWRYmvdYmZufoV3CJv+IZfVzax8=") //chave secreta
+	store = sessions.NewCookieStore(key)
+)
+
 // Função para servir páginas HTML
 func renderTemplate(w http.ResponseWriter, tmpl string) {
 	tmplPath := filepath.Join("templates", tmpl)
@@ -74,6 +81,124 @@ func renderTemplate(w http.ResponseWriter, tmpl string) {
 } // Manipulador para a página principal
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "index.html")
+}
+
+func authenticateUser(db *sql.DB, cpf string, password string) (bool, int, error) {
+	var storedPassword string
+	var userType int
+
+	query := "SELECT senha, tipo_usuario FROM usuario WHERE cpf = $1"
+	err := db.QueryRow(query, cpf).Scan(&storedPassword, &userType)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, 0, nil
+		}
+		return false, 0, err
+	}
+
+	if password != storedPassword {
+		return false, 0, nil
+	}
+
+	return true, userType, nil
+}
+
+func loginHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			renderTemplate(w, "login.html")
+			return
+		}
+
+		if r.Method == http.MethodPost {
+			cpf := r.FormValue("username")
+			password := r.FormValue("password")
+
+			authenticated, userType, err := authenticateUser(db, cpf, password)
+			if err != nil {
+				http.Error(w, "Erro interno do servidor", http.StatusInternalServerError)
+				return
+			}
+
+			if authenticated {
+				session, _ := store.Get(r, "session-name")
+				session.Values["authenticated"] = true
+				session.Values["userType"] = userType
+				session.Save(r, w)
+
+				// Redirecionamento baseado no tipo de usuário
+				switch userType {
+				case 1:
+					http.Redirect(w, r, "templates/dashboard-acs.html", http.StatusSeeOther)
+				case 2:
+					http.Redirect(w, r, "templates/dashboard-adm.html", http.StatusSeeOther)
+				default:
+					http.Error(w, "Tipo de usuário desconhecido", http.StatusUnauthorized)
+				}
+			} else {
+				http.Error(w, "CPF ou senha incorretos", http.StatusUnauthorized)
+			}
+		}
+	}
+}
+
+func dashboardACSHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "session-name")
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		http.Error(w, "Acesso não autorizado", http.StatusUnauthorized)
+		return
+	}
+
+	userType := session.Values["userType"]
+	if userType != 1 {
+		http.Error(w, "Acesso não autorizado", http.StatusUnauthorized)
+		return
+	}
+
+	switch r.URL.Path {
+	case "/dashboard-adm":
+		renderTemplate(w, "templates/dashboard-acs.html")
+	case "/cadastrar-paciente":
+		renderTemplate(w, "templates/cadastrar-paciente.html")
+	case "/cadastro-sucesso-paciente":
+		renderTemplate(w, "templates/cadastro-sucesso-paciente.html")
+	case "/perfil-usuario":
+		renderTemplate(w, "templates/perfil-usuario.html")
+	case "/atualizar-paciente":
+		renderTemplate(w, "templates/atualizar-paciente.html")
+	case "/atualizar-perfil":
+		renderTemplate(w, "templates/atualizar-perfil.html")
+	case "/atualizado-sucesso-paciente":
+		renderTemplate(w, "templates/atualizado-sucesso-paciente.html")
+	case "/atualizado-sucesso-perfil":
+		renderTemplate(w, "templates/atualizado-sucesso-perfil.html")
+	case "/lista-consultas":
+		renderTemplate(w, "templates/lista-consultas.html")
+	case "/duvidas-frequentes":
+		renderTemplate(w, "templates/duvidas-frequentes.html")
+	case "/lista-pacientes":
+		renderTemplate(w, "templates/lista-pacientes.html")
+	case "/outra":
+		renderTemplate(w, "templates/outra.html")
+	default:
+		http.NotFound(w, r)
+	}
+}
+
+func dashboardADMHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "session-name")
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		http.Error(w, "Acesso não autorizado", http.StatusUnauthorized)
+		return
+	}
+
+	userType := session.Values["userType"]
+	if userType != 2 {
+		http.Error(w, "Acesso não autorizado", http.StatusUnauthorized)
+		return
+	}
+
+	renderTemplate(w, r.URL.Path)
 }
 
 func main() {
@@ -95,25 +220,29 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Print de confirmação para ser retirado
+	// Print de confirmação para ser retirado ou n
 	fmt.Println("Conexão bem-sucedida!")
 
-	// Roteamento para arquivos estáticos
+	// Para abrir arquivos estáticos
 	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("public"))))
 	http.Handle("/templates/", http.StripPrefix("/templates/", http.FileServer(http.Dir("templates"))))
 
-	// Roteamento para a página principal
+	// ativa a página principal
 	http.HandleFunc("/", homeHandler)
-
-	// Roteamento para o cadastro
+	// Ativa a função de login
+	http.HandleFunc("/login", loginHandler(db))
+	http.HandleFunc("/dashboard-acs", dashboardACSHandler)
+	http.HandleFunc("/dashboard-adm", dashboardADMHandler)
+	// Ativa o cadastro
 	http.HandleFunc("/cadastro", cadastroHandler)
-	// Roteamento para o cadastro de usuários
+	// Ativa o cadastro de usuários
 	http.HandleFunc("/cadastro-acs", cadastroAcsHandler)
 
 	// Inicia o servidor na porta 8080
 	http.ListenAndServe(":8080", nil)
 
 }
+
 func cadastroHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
@@ -195,8 +324,8 @@ func salvarNoBanco(p Paciente) error {
 
 	stmt, err := db.Prepare(`INSERT INTO paciente (nome, cpf, cartao_sus, data_nascimento, sexo, unidade_origem,
                                 email, celular, celular2, nome_mae, cep, cidade, bairro, endereco,
-                                tabagista, etilista, lesoes, imagem, consulta)
-                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`)
+                                tabagista, etilista, lesoes, imagem, consulta, inativo)
+                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)`)
 	if err != nil {
 		log.Printf("Erro ao preparar declaração SQL: %v", err)
 		return err
@@ -266,8 +395,8 @@ func salvarUsuarioNoBanco(u Usuario) error {
 	defer db.Close()
 
 	// Preparar a instrução SQL para inserção
-	stmt, err := db.Prepare(`INSERT INTO usuario (senha, nome, cpf, cbo, ine, cnes, data_nascimento, sexo, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tipo_usuario)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`)
+	stmt, err := db.Prepare(`INSERT INTO usuario (senha, nome, cpf, cbo, ine, cnes, data_nascimento, sexo, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tipo_usuario, inativo)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`)
 	if err != nil {
 		log.Printf("Erro ao preparar declaração SQL: %v", err)
 		return err
