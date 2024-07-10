@@ -6,52 +6,54 @@
     <title>Listagem de Pacientes</title>
 </head>
 <body>
-    <h1>Listagem de Pacientes</h1>
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>CPF</th>
-            <th>Data de Nascimento</th>
-            <th>Sexo</th>
-            <th>Unidade de Origem</th>
-            <th>Email</th>
-            <th>Celular</th>
-            <th>Celular2</th>
-            <th>Nome da Mãe</th>
-            <th>CEP</th>
-            <th>Cidade</th>
-            <th>Bairro</th>
-            <th>Endereço</th>
-            <th>Tabagista</th>
-            <th>Etilista</th>
-            <th>Lesões</th>
-            <th>Imagem</th>
-            <th>Consulta</th>
-        </tr>
-        {{ range . }}
-        <tr>
-            <td>{{ .ID }}</td>
-            <td>{{ .Nome }}</td>
-            <td>{{ .CPF }}</td>
-            <td>{{ .DataNascimento }}</td>
-            <td>{{ .Sexo }}</td>
-            <td>{{ .UnidadeOrigem }}</td>
-            <td>{{ .Email }}</td>
-            <td>{{ .Celular }}</td>
-            <td>{{ .Celular2 }}</td>
-            <td>{{ .NomeMae }}</td>
-            <td>{{ .CEP }}</td>
-            <td>{{ .Cidade }}</td>
-            <td>{{ .Bairro }}</td>
-            <td>{{ .Endereco }}</td>
-            <td>{{ .Tabagista }}</td>
-            <td>{{ .Elitista }}</td>
-            <td>{{ .Lesoes }}</td>
-            <td>{{ .Imagem }}</td>
-            <td>{{ .Consulta }}</td>
-        </tr>
-        {{ end }}
+    <h1>Lista de Pacientes</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Cartão SUS</th>
+                <th>Data de Nascimento</th>
+                <th>Sexo</th>
+                <th>Unidade de Origem</th>
+                <th>Email</th>
+                <th>Celular 1</th>
+                <th>Celular 2</th>
+                <th>Nome da Mãe</th>
+                <th>CEP</th>
+                <th>Cidade</th>
+                <th>Bairro</th>
+                <th>Endereço</th>
+                <th>Tabagista</th>
+                <th>Etilista</th>
+                <th>Lesões</th>
+                <th>Consulta</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .}}
+            <tr>
+                <td>{{.Nome}}</td>
+                <td>{{.CPF}}</td>
+                <td>{{.CartaoSUS}}</td>
+                <td>{{.DataNascimento}}</td>
+                <td>{{.Sexo}}</td>
+                <td>{{.UnidadeOrigem}}</td>
+                <td>{{.Email}}</td>
+                <td>{{.Celular1}}</td>
+                <td>{{.Celular2}}</td>
+                <td>{{.NomeMae}}</td>
+                <td>{{.CEP}}</td>
+                <td>{{.Cidade}}</td>
+                <td>{{.Bairro}}</td>
+                <td>{{.Endereco}}</td>
+                <td>{{if .Tabagista}}Sim{{else}}Não{{end}}</td>
+                <td>{{if .Etilista}}Sim{{else}}Não{{end}}</td>
+                <td>{{if .Lesoes}}Sim{{else}}Não{{end}}</td>
+                <td>{{if .Consulta}}Sim{{else}}Não{{end}}</td>
+            </tr>
+            {{end}}
+        </tbody>
     </table>
 </body>
 </html>

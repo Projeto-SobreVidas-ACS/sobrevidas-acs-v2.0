@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"strconv"
 
 	"github.com/gorilla/sessions"
 
@@ -65,20 +66,23 @@ type Usuario struct {
 }
 
 var (
-	key   = []byte("PhaFjVgy4TioRUpPNWRYmvdYmZufoV3CJv+IZfVzax8=") //chave secreta
+	key   = []byte("PhaFjVgy4TioRUpPNWRYmvdYmZufoV3CJv+IZfVzax8=") //chave
 	store = sessions.NewCookieStore(key)
 )
 
-// Função para servir páginas HTML
 func renderTemplate(w http.ResponseWriter, tmpl string) {
+	renderTemplateWithData(w, tmpl, nil)
+}
+
+func renderTemplateWithData(w http.ResponseWriter, tmpl string, data interface{}) {
 	tmplPath := filepath.Join("templates", tmpl)
 	t, err := template.ParseFiles(tmplPath)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	t.Execute(w, nil)
-} // Manipulador para a página principal
+	t.Execute(w, data)
+}
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "index.html")
 }
@@ -126,17 +130,14 @@ func loginHandler(db *sql.DB) http.HandlerFunc {
 				session.Values["userType"] = userType
 				session.Save(r, w)
 
-				// Redirecionamento baseado no tipo de usuário
 				switch userType {
 				case 1:
 					http.Redirect(w, r, "templates/dashboard-acs.html", http.StatusSeeOther)
 				case 2:
 					http.Redirect(w, r, "templates/dashboard-adm.html", http.StatusSeeOther)
 				default:
-					http.Error(w, "Tipo de usuário desconhecido", http.StatusUnauthorized)
+					http.Error(w, "CPF ou senha incorretos", http.StatusUnauthorized)
 				}
-			} else {
-				http.Error(w, "CPF ou senha incorretos", http.StatusUnauthorized)
 			}
 		}
 	}
@@ -201,55 +202,12 @@ func dashboardADMHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, r.URL.Path)
 }
 
-func main() {
-	//BANCO
-	// Constrói uma string de conexão
-	psqlInfoBanco := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-
-	// Abre a conexão com o banco de dados
-	db, err := sql.Open("postgres", psqlInfoBanco)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	// Verifica a conexão
-	err = db.Ping()
-	if err != nil {
-		log.Fatal(err)
-	}
-	// Print de confirmação para ser retirado ou n
-	fmt.Println("Conexão bem-sucedida!")
-
-	// Para abrir arquivos estáticos
-	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("public"))))
-	http.Handle("/templates/", http.StripPrefix("/templates/", http.FileServer(http.Dir("templates"))))
-
-	// ativa a página principal
-	http.HandleFunc("/", homeHandler)
-	// Ativa a função de login
-	http.HandleFunc("/login", loginHandler(db))
-	http.HandleFunc("/dashboard-acs", dashboardACSHandler)
-	http.HandleFunc("/dashboard-adm", dashboardADMHandler)
-	// Ativa o cadastro
-	http.HandleFunc("/cadastro", cadastroHandler)
-	// Ativa o cadastro de usuários
-	http.HandleFunc("/cadastro-acs", cadastroAcsHandler)
-
-	// Inicia o servidor na porta 8080
-	http.ListenAndServe(":8080", nil)
-
-}
-
 func cadastroHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
 		return
 	}
 
-	// Parsear os dados do formulário
 	err := r.ParseMultipartForm(10 << 20) // 10 MB
 	if err != nil {
 		http.Error(w, "Erro ao parsear formulário", http.StatusBadRequest)
@@ -257,10 +215,10 @@ func cadastroHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Inicializar variável para armazenar a imagem
+	//variável para armazenar a imagem
 	var fileBytes []byte
 
-	// Verificar se foi enviado um arquivo de imagem
+	// verificar se foi enviado imagem
 	file, _, err := r.FormFile("imagem")
 	if err == nil {
 		defer file.Close()
@@ -277,7 +235,7 @@ func cadastroHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Criar um paciente com os dados do formulário
+	// cria paciente com os dados do formulário
 	paciente := Paciente{
 		Nome:           r.FormValue("nome"),
 		CPF:            r.FormValue("cpf"),
@@ -300,7 +258,6 @@ func cadastroHandler(w http.ResponseWriter, r *http.Request) {
 		Consulta:       r.FormValue("consulta") == "true",
 	}
 
-	// Salvar no banco de dados
 	err = salvarNoBanco(paciente)
 	if err != nil {
 		http.Error(w, "Erro ao salvar no banco de dados", http.StatusInternalServerError)
@@ -308,7 +265,6 @@ func cadastroHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Exemplo de resposta de sucesso
 	http.Redirect(w, r, "/templates/cadastro-sucesso-paciente.html", http.StatusSeeOther)
 }
 
@@ -324,8 +280,8 @@ func salvarNoBanco(p Paciente) error {
 
 	stmt, err := db.Prepare(`INSERT INTO paciente (nome, cpf, cartao_sus, data_nascimento, sexo, unidade_origem,
                                 email, celular, celular2, nome_mae, cep, cidade, bairro, endereco,
-                                tabagista, etilista, lesoes, imagem, consulta, inativo)
-                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)`)
+                                tabagista, etilista, lesoes, imagem, consulta)
+                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`)
 	if err != nil {
 		log.Printf("Erro ao preparar declaração SQL: %v", err)
 		return err
@@ -342,15 +298,25 @@ func salvarNoBanco(p Paciente) error {
 
 	return nil
 }
+
 func cadastroAcsHandler(w http.ResponseWriter, r *http.Request) {
-	// Parse do formulário
+	if r.Method != http.MethodPost {
+		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
+		return
+	}
 	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Extrair dados do formulário
+	tipoUsuarioStr := r.FormValue("tipo")
+	tipoUsuario, err := strconv.Atoi(tipoUsuarioStr)
+	if err != nil {
+		http.Error(w, "Tipo de usuário inválido", http.StatusBadRequest)
+		return
+	}
+
 	usuario := Usuario{
 		Senha:          r.FormValue("password"),
 		Nome:           r.FormValue("nome"),
@@ -368,25 +334,20 @@ func cadastroAcsHandler(w http.ResponseWriter, r *http.Request) {
 		Cidade:         r.FormValue("cidade"),
 		Bairro:         r.FormValue("bairro"),
 		Endereco:       r.FormValue("enderecoCompleto"),
-		TipoUsuario:    1, // Defina o tipo de usuário conforme necessário
+		TipoUsuario:    tipoUsuario,
 	}
 
-	// Inserir no banco de dados
 	err = salvarUsuarioNoBanco(usuario)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// Redirecionar ou exibir uma mensagem de sucesso
 	http.Redirect(w, r, "/templates/cadastro-sucesso-usuario.html", http.StatusSeeOther)
 }
 func salvarUsuarioNoBanco(u Usuario) error {
-	// Construir a string de conexão
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
-	// Abrir a conexão com o banco de dados
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Printf("Erro ao conectar ao banco de dados: %v", err)
@@ -394,16 +355,14 @@ func salvarUsuarioNoBanco(u Usuario) error {
 	}
 	defer db.Close()
 
-	// Preparar a instrução SQL para inserção
-	stmt, err := db.Prepare(`INSERT INTO usuario (senha, nome, cpf, cbo, ine, cnes, data_nascimento, sexo, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tipo_usuario, inativo)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`)
+	stmt, err := db.Prepare(`INSERT INTO usuario (senha, nome, cpf, cbo, ine, cnes, data_nascimento, sexo, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tipo_usuario)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`)
 	if err != nil {
 		log.Printf("Erro ao preparar declaração SQL: %v", err)
 		return err
 	}
 	defer stmt.Close()
 
-	// Executar a instrução SQL
 	_, err = stmt.Exec(u.Senha, u.Nome, u.CPF, u.CBO, u.INE, u.CNES, u.DataNascimento, u.Sexo,
 		u.Email, u.Celular, u.Celular2, u.NomeMae, u.CEP, u.Cidade, u.Bairro,
 		u.Endereco, u.TipoUsuario)
@@ -414,4 +373,88 @@ func salvarUsuarioNoBanco(u Usuario) error {
 
 	fmt.Println("Novo usuário inserido com sucesso.")
 	return nil
+}
+
+func getPacientes(db *sql.DB) ([]Paciente, error) {
+	query := `
+        SELECT nome, cpf, cartao_sus, data_nascimento, sexo, unidade_origem, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tabagista, etilista, lesoes, imagem, consulta 
+        FROM paciente
+        WHERE inativo = false
+    `
+	rows, err := db.Query(query)
+	if err != nil {
+		log.Printf("Erro ao executar consulta: %v", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var pacientes []Paciente
+	for rows.Next() {
+		var p Paciente
+		err := rows.Scan(&p.Nome, &p.CPF, &p.CartaoSUS, &p.DataNascimento, &p.Sexo, &p.UnidadeOrigem, &p.Email, &p.Celular1, &p.Celular2, &p.NomeMae, &p.CEP, &p.Cidade, &p.Bairro, &p.Endereco, &p.Tabagista, &p.Etilista, &p.Lesoes, &p.Imagem, &p.Consulta)
+		if err != nil {
+			log.Printf("Erro ao fazer scan dos resultados: %v", err)
+			return nil, err
+		}
+		pacientes = append(pacientes, p)
+	}
+
+	log.Printf("Número de pacientes encontrados: %d", len(pacientes))
+	return pacientes, nil
+}
+
+func listarPacientesHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		pacientes, err := getPacientes(db)
+		if err != nil {
+			log.Printf("Erro ao obter pacientes: %v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		log.Printf("Renderizando template com %d pacientes", len(pacientes))
+		renderTemplateWithData(w, "lista-pacientes.html", pacientes)
+	}
+}
+
+func main() {
+	//BANCO
+	// string de conexão
+	psqlInfoBanco := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+	// abre a conexão
+	db, err := sql.Open("postgres", psqlInfoBanco)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+	// verifica a conexão
+	err = db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+	// print de confirmação para ser retirado ou n
+	fmt.Println("Conexão bem-sucedida!")
+
+	// para abrir arquivos estáticos
+	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("public"))))
+	http.Handle("/templates/", http.StripPrefix("/templates/", http.FileServer(http.Dir("templates"))))
+
+	// ativa a página principal
+	http.HandleFunc("/", homeHandler)
+	// ativa a função de login
+	http.HandleFunc("/login", loginHandler(db))
+	http.HandleFunc("/dashboard-acs", dashboardACSHandler)
+	http.HandleFunc("/dashboard-adm", dashboardADMHandler)
+	// ativa o cadastro
+	http.HandleFunc("/cadastro", cadastroHandler)
+	// ativa o cadastro de usuários
+	http.HandleFunc("/cadastro-acs", cadastroAcsHandler)
+	//ativa listar paciente
+	http.HandleFunc("/lista-pacientes", listarPacientesHandler(db))
+
+	// inicia o servidor na porta 8080
+	http.ListenAndServe(":8080", nil)
+
 }
