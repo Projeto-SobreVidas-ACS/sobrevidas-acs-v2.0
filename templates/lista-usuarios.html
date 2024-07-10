@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"  href="../public/static/css/global.css" />
+  	<link rel="stylesheet"  href="../public/static/css/lista.css" />
+  	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Josefin Sans:wght@400&display=swap" />
+  	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open Sans:wght@400;700;800&display=swap" />
+    <title>Listagem de Usuários</title>
+</head>
+<body>
+    <header> 
+		<div class="logo">
+			<a href="/templates/dashboard-adm.html"><img class="icone" alt="Ícone do SobreVidas ACS" src="../public/assets/images/icone.png"></a>
+        	<h1 class="titulo">SobreVidas ACS</h1>
+		</div>
+		<div class="menu">
+			<a class="link" href=""><p class="contato">Contato ▽</p></a>
+			<a class="link" href=""><p class="duvidas">Duvidas ▽</p></a>
+			<a class="notificacoes" href=""><img class="notificacoes-icon" alt="" src="../public/assets/images/icone-notificacao.png"></a>
+			<a class="perfil" href=""><img class="icone-perfil" alt="" src="../public/assets/images/icone-perfil.png"></a>
+		</div>
+    </header>
+    <main>
+        <a class="voltar" href="/templates/dashboard-adm.html">Voltar</a>
+        <h2 class="lista">Lista de Usuários</h2>
+        <p class="instru">Caso alguma dúvida no cadastro verifique dúvidas frequentes ou entre em Contato para mais informações.</p>
+        <form action="/lista-usuarios" method="post">
+            <label for="buscar-cpf-user">Buscar por CPF:</label>
+            <input type="text" id="buscar-cpf-user" name="buscar-cpf-user">
+            <button type="submit"><img src="../public/assets/images/lupa.png" alt=""></button>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th class="name">Nome</th>
+                    <th>CPF</th>
+                    <th>CBO</th>
+                    <th>INE</th>
+                    <th>CNES</th>
+                    <th>Data de Nascimento</th>
+                    <th>Sexo</th>
+                    <th>Cidade</th>
+                    <th>Bairro</th>
+                    <th>Tipo de Usuário</th>
+                    <th>&#x1F5C2;&#xFE0F;</th>
+                    <th>&#x1F4DD;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .}}
+                <tr>
+                    <td class="name">{{.Nome}}</td>
+                    <td>{{.CPF}}</td>
+                    <td>{{.CBO}}</td>
+                    <td>{{.INE}}</td>
+                    <td>{{.CNES}}</td>
+                    <td>{{.DataNascimento}}</td>
+                    <td>{{.Sexo}}</td>
+                    <td>{{.Cidade}}</td>
+                    <td>{{.Bairro}}</td>
+                    <td>{{ if eq .TipoUsuario 1 }}ACS{{ else }}ADM{{ end }}</td>
+                    <td><a href="visu">&#x1F441;&#xFE0F;</a></td>
+                    <td><a href="edit">&#x270F;&#xFE0F;</a></td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </main>
+    <footer class="rodape">
+        <p class="join">Junte-se a essa jornada!</p>
+        <p class="apoio">Juntos, podemos espalhar sorrisos e conscientização, combatendo o câncer de boca um passo de cada vez.</p>
+        <p class="copyright">© 2024 Copyright - Sobre Vidas ACS</p>
+    </footer>
+</body>
+</html>

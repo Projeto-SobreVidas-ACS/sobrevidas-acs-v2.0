@@ -87,6 +87,18 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "index.html")
 }
 
+func requireAuth(handler http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "session-name")
+		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+			log.Print("Acesso não autorizado")
+			http.Redirect(w, r, "/index", http.StatusSeeOther)
+			return
+		}
+		handler.ServeHTTP(w, r)
+	}
+}
+
 func authenticateUser(db *sql.DB, cpf string, password string) (bool, int, error) {
 	var storedPassword string
 	var userType int
@@ -375,6 +387,24 @@ func salvarUsuarioNoBanco(u Usuario) error {
 	return nil
 }
 
+func getPacienteByCPF(db *sql.DB, cpf string) ([]Paciente, error) {
+	query := `
+        SELECT nome, cpf, cartao_sus, data_nascimento, sexo, unidade_origem, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tabagista, etilista, lesoes, imagem, consulta 
+        FROM paciente
+        WHERE cpf = $1 AND inativo = false
+    `
+	var paciente1 []Paciente
+	var p Paciente
+	err := db.QueryRow(query, cpf).Scan(&p.Nome, &p.CPF, &p.CartaoSUS, &p.DataNascimento, &p.Sexo, &p.UnidadeOrigem, &p.Email, &p.Celular1, &p.Celular2, &p.NomeMae, &p.CEP, &p.Cidade, &p.Bairro, &p.Endereco, &p.Tabagista, &p.Etilista, &p.Lesoes, &p.Imagem, &p.Consulta)
+	if err != nil {
+		log.Printf("Erro ao fazer scan dos resultados: %v", err)
+		return nil, err
+	}
+	paciente1 = append(paciente1, p)
+
+	return paciente1, nil
+}
+
 func getPacientes(db *sql.DB) ([]Paciente, error) {
 	query := `
         SELECT nome, cpf, cartao_sus, data_nascimento, sexo, unidade_origem, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tabagista, etilista, lesoes, imagem, consulta 
@@ -405,15 +435,104 @@ func getPacientes(db *sql.DB) ([]Paciente, error) {
 
 func listarPacientesHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Verificar se um CPF foi fornecido na query string
+		cpf := r.FormValue("buscar-cpf")
+		if cpf != "" {
+			paciente, err := getPacienteByCPF(db, cpf)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			renderTemplateWithData(w, "lista-pacientes.html", paciente)
+			return
+		}
+
+		// listar todos os pacientes
 		pacientes, err := getPacientes(db)
 		if err != nil {
 			log.Printf("Erro ao obter pacientes: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
 		log.Printf("Renderizando template com %d pacientes", len(pacientes))
 		renderTemplateWithData(w, "lista-pacientes.html", pacientes)
+	}
+}
+
+func getUsuarioByCPF(db *sql.DB, cpf string) ([]Usuario, error) {
+	query := `
+        SELECT nome, cpf, cbo, ine, cnes, data_nascimento, sexo, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tipo_usuario 
+		FROM usuario
+        WHERE cpf = $1 AND inativo = false
+    `
+	var usuario1 []Usuario
+	var u Usuario
+	err := db.QueryRow(query, cpf).Scan(&u.Nome, &u.CPF, &u.CBO, &u.INE, &u.CNES, &u.DataNascimento, &u.Sexo,
+		&u.Email, &u.Celular, &u.Celular2, &u.NomeMae, &u.CEP, &u.Cidade, &u.Bairro,
+		&u.Endereco, &u.TipoUsuario)
+
+	if err != nil {
+		log.Printf("Erro ao fazer scan dos resultados: %v", err)
+		return nil, err
+	}
+	usuario1 = append(usuario1, u)
+
+	return usuario1, nil
+}
+
+func getUsuarios(db *sql.DB) ([]Usuario, error) {
+	query := `
+        SELECT nome, cpf, cbo, ine, cnes, data_nascimento, sexo, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tipo_usuario 
+		FROM usuario
+        WHERE inativo = false
+    `
+	rows, err := db.Query(query)
+	if err != nil {
+		log.Printf("Erro ao executar consulta: %v", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var usuarios []Usuario
+	for rows.Next() {
+		var u Usuario
+		err := rows.Scan(&u.Nome, &u.CPF, &u.CBO, &u.INE, &u.CNES, &u.DataNascimento, &u.Sexo,
+			&u.Email, &u.Celular, &u.Celular2, &u.NomeMae, &u.CEP, &u.Cidade, &u.Bairro,
+			&u.Endereco, &u.TipoUsuario)
+		if err != nil {
+			log.Printf("Erro ao fazer scan dos resultados: %v", err)
+			return nil, err
+		}
+		usuarios = append(usuarios, u)
+	}
+
+	log.Printf("Número de usuarios encontrados: %d", len(usuarios))
+	return usuarios, nil
+}
+
+func listarUsuariosHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Verificar se um CPF foi fornecido na query string
+		cpf := r.FormValue("buscar-cpf-user")
+		if cpf != "" {
+			usuario, err := getUsuarioByCPF(db, cpf)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			renderTemplateWithData(w, "lista-usuarios.html", usuario)
+			return
+		}
+
+		usuarios, err := getUsuarios(db)
+		if err != nil {
+			log.Printf("Erro ao obter usuarios: %v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		log.Printf("Renderizando template com %d usuarios", len(usuarios))
+		renderTemplateWithData(w, "lista-usuarios.html", usuarios)
 	}
 }
 
@@ -445,14 +564,16 @@ func main() {
 	http.HandleFunc("/", homeHandler)
 	// ativa a função de login
 	http.HandleFunc("/login", loginHandler(db))
-	http.HandleFunc("/dashboard-acs", dashboardACSHandler)
-	http.HandleFunc("/dashboard-adm", dashboardADMHandler)
+
+	http.HandleFunc("/dashboard-acs", requireAuth(dashboardACSHandler))
+	http.HandleFunc("/dashboard-adm", requireAuth(dashboardADMHandler))
 	// ativa o cadastro
-	http.HandleFunc("/cadastro", cadastroHandler)
+	http.HandleFunc("/cadastro", requireAuth(cadastroHandler))
 	// ativa o cadastro de usuários
-	http.HandleFunc("/cadastro-acs", cadastroAcsHandler)
+	http.HandleFunc("/cadastro-acs", requireAuth(cadastroAcsHandler))
 	//ativa listar paciente
-	http.HandleFunc("/lista-pacientes", listarPacientesHandler(db))
+	http.HandleFunc("/lista-pacientes", requireAuth(listarPacientesHandler(db)))
+	http.HandleFunc("/lista-usuarios", requireAuth(listarUsuariosHandler(db)))
 
 	// inicia o servidor na porta 8080
 	http.ListenAndServe(":8080", nil)
