@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/sessions"
 
@@ -24,6 +25,7 @@ const (
 )
 
 type Paciente struct {
+	ID             string
 	Nome           string
 	CPF            string
 	CartaoSUS      string
@@ -46,6 +48,7 @@ type Paciente struct {
 }
 
 type Usuario struct {
+	ID             string
 	Senha          string
 	Nome           string
 	CPF            string
@@ -389,13 +392,13 @@ func salvarUsuarioNoBanco(u Usuario) error {
 
 func getPacienteByCPF(db *sql.DB, cpf string) ([]Paciente, error) {
 	query := `
-        SELECT nome, cpf, cartao_sus, data_nascimento, sexo, unidade_origem, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tabagista, etilista, lesoes, imagem, consulta 
+        SELECT id, nome, cpf, cartao_sus, data_nascimento, sexo, unidade_origem, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tabagista, etilista, lesoes, imagem, consulta 
         FROM paciente
         WHERE cpf = $1 AND inativo = false
     `
 	var paciente1 []Paciente
 	var p Paciente
-	err := db.QueryRow(query, cpf).Scan(&p.Nome, &p.CPF, &p.CartaoSUS, &p.DataNascimento, &p.Sexo, &p.UnidadeOrigem, &p.Email, &p.Celular1, &p.Celular2, &p.NomeMae, &p.CEP, &p.Cidade, &p.Bairro, &p.Endereco, &p.Tabagista, &p.Etilista, &p.Lesoes, &p.Imagem, &p.Consulta)
+	err := db.QueryRow(query, cpf).Scan(&p.ID, &p.Nome, &p.CPF, &p.CartaoSUS, &p.DataNascimento, &p.Sexo, &p.UnidadeOrigem, &p.Email, &p.Celular1, &p.Celular2, &p.NomeMae, &p.CEP, &p.Cidade, &p.Bairro, &p.Endereco, &p.Tabagista, &p.Etilista, &p.Lesoes, &p.Imagem, &p.Consulta)
 	if err != nil {
 		log.Printf("Erro ao fazer scan dos resultados: %v", err)
 		return nil, err
@@ -407,7 +410,7 @@ func getPacienteByCPF(db *sql.DB, cpf string) ([]Paciente, error) {
 
 func getPacientes(db *sql.DB) ([]Paciente, error) {
 	query := `
-        SELECT nome, cpf, cartao_sus, data_nascimento, sexo, unidade_origem, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tabagista, etilista, lesoes, imagem, consulta 
+        SELECT id, nome, cpf, cartao_sus, data_nascimento, sexo, unidade_origem, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tabagista, etilista, lesoes, imagem, consulta 
         FROM paciente
         WHERE inativo = false
     `
@@ -421,7 +424,7 @@ func getPacientes(db *sql.DB) ([]Paciente, error) {
 	var pacientes []Paciente
 	for rows.Next() {
 		var p Paciente
-		err := rows.Scan(&p.Nome, &p.CPF, &p.CartaoSUS, &p.DataNascimento, &p.Sexo, &p.UnidadeOrigem, &p.Email, &p.Celular1, &p.Celular2, &p.NomeMae, &p.CEP, &p.Cidade, &p.Bairro, &p.Endereco, &p.Tabagista, &p.Etilista, &p.Lesoes, &p.Imagem, &p.Consulta)
+		err := rows.Scan(&p.ID, &p.Nome, &p.CPF, &p.CartaoSUS, &p.DataNascimento, &p.Sexo, &p.UnidadeOrigem, &p.Email, &p.Celular1, &p.Celular2, &p.NomeMae, &p.CEP, &p.Cidade, &p.Bairro, &p.Endereco, &p.Tabagista, &p.Etilista, &p.Lesoes, &p.Imagem, &p.Consulta)
 		if err != nil {
 			log.Printf("Erro ao fazer scan dos resultados: %v", err)
 			return nil, err
@@ -461,13 +464,13 @@ func listarPacientesHandler(db *sql.DB) http.HandlerFunc {
 
 func getUsuarioByCPF(db *sql.DB, cpf string) ([]Usuario, error) {
 	query := `
-        SELECT nome, cpf, cbo, ine, cnes, data_nascimento, sexo, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tipo_usuario 
+        SELECT id, nome, cpf, cbo, ine, cnes, data_nascimento, sexo, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tipo_usuario 
 		FROM usuario
         WHERE cpf = $1 AND inativo = false
     `
 	var usuario1 []Usuario
 	var u Usuario
-	err := db.QueryRow(query, cpf).Scan(&u.Nome, &u.CPF, &u.CBO, &u.INE, &u.CNES, &u.DataNascimento, &u.Sexo,
+	err := db.QueryRow(query, cpf).Scan(&u.ID, &u.Nome, &u.CPF, &u.CBO, &u.INE, &u.CNES, &u.DataNascimento, &u.Sexo,
 		&u.Email, &u.Celular, &u.Celular2, &u.NomeMae, &u.CEP, &u.Cidade, &u.Bairro,
 		&u.Endereco, &u.TipoUsuario)
 
@@ -482,7 +485,7 @@ func getUsuarioByCPF(db *sql.DB, cpf string) ([]Usuario, error) {
 
 func getUsuarios(db *sql.DB) ([]Usuario, error) {
 	query := `
-        SELECT nome, cpf, cbo, ine, cnes, data_nascimento, sexo, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tipo_usuario 
+        SELECT id, nome, cpf, cbo, ine, cnes, data_nascimento, sexo, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tipo_usuario 
 		FROM usuario
         WHERE inativo = false
     `
@@ -496,7 +499,7 @@ func getUsuarios(db *sql.DB) ([]Usuario, error) {
 	var usuarios []Usuario
 	for rows.Next() {
 		var u Usuario
-		err := rows.Scan(&u.Nome, &u.CPF, &u.CBO, &u.INE, &u.CNES, &u.DataNascimento, &u.Sexo,
+		err := rows.Scan(&u.ID, &u.Nome, &u.CPF, &u.CBO, &u.INE, &u.CNES, &u.DataNascimento, &u.Sexo,
 			&u.Email, &u.Celular, &u.Celular2, &u.NomeMae, &u.CEP, &u.Cidade, &u.Bairro,
 			&u.Endereco, &u.TipoUsuario)
 		if err != nil {
@@ -536,6 +539,105 @@ func listarUsuariosHandler(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+func editarPacienteHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := r.URL.Query().Get("id")
+
+		var paciente Paciente
+
+		err := db.QueryRow("SELECT id, nome, cpf, cartao_sus, data_nascimento, sexo, unidade_origem, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tabagista, etilista, lesoes, imagem, consulta FROM paciente WHERE id = $1", id).Scan(
+			&paciente.ID, &paciente.Nome, &paciente.CPF, &paciente.CartaoSUS, &paciente.DataNascimento, &paciente.Sexo, &paciente.UnidadeOrigem, &paciente.Email, &paciente.Celular1, &paciente.Celular2, &paciente.NomeMae, &paciente.CEP, &paciente.Cidade, &paciente.Bairro, &paciente.Endereco, &paciente.Tabagista, &paciente.Etilista, &paciente.Lesoes, &paciente.Imagem, &paciente.Consulta)
+
+		if err != nil {
+			http.Error(w, "Paciente não encontrado", http.StatusNotFound)
+			return
+		}
+
+		// Parse da string para um objeto time.Time
+		parsedTime, err := time.Parse(time.RFC3339, paciente.DataNascimento)
+		if err != nil {
+			http.Error(w, "Erro ao fazer parse da data", http.StatusInternalServerError)
+			return
+		}
+
+		// Formata a data no formato YYYY-MM-DD
+		DataFormat := parsedTime.Format("2006-01-02")
+		paciente.DataNascimento = DataFormat
+
+		tmpl, err := template.ParseFiles("templates/atualizar-paciente.html")
+		log.Print(paciente.DataNascimento)
+		if err != nil {
+			http.Error(w, "Erro ao carregar o template", http.StatusInternalServerError)
+			return
+		}
+
+		tmpl.Execute(w, paciente)
+	}
+}
+
+func atualizarPacienteHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
+			return
+		}
+
+		if err := r.ParseMultipartForm(10 << 20); err != nil {
+			http.Error(w, "Erro ao analisar o formulário: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		id := r.FormValue("id")
+		nome := r.FormValue("nome")
+
+		cartaoSUS := r.FormValue("cartaoSUS")
+		dataNascimento := r.FormValue("dataNascimento")
+		sexo := r.FormValue("sexo")
+		unidadeOrigem := r.FormValue("unidadeOrigem")
+		email := r.FormValue("email")
+		celular := r.FormValue("telefone1")
+		celular2 := r.FormValue("telefone2")
+		nomeMae := r.FormValue("nomeMae")
+		cep := r.FormValue("cep")
+		cidade := r.FormValue("cidade")
+		bairro := r.FormValue("bairro")
+		endereco := r.FormValue("enderecoCompleto")
+		tabagista := r.FormValue("tabagista") == "true"
+		etilista := r.FormValue("etilista") == "true"
+		lesoes := r.FormValue("lesoes") == "true"
+		consulta := r.FormValue("consulta") == "true"
+
+		log.Print(dataNascimento)
+
+		var imagem []byte
+		file, _, err := r.FormFile("imagem")
+		if err == nil {
+			defer file.Close()
+			imagem, err = io.ReadAll(file)
+			if err != nil {
+				http.Error(w, "Erro ao ler a imagem: "+err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+
+		_, err = db.Exec(`
+            UPDATE paciente
+            SET nome = $1, cartao_sus = $2, data_nascimento = $3, sexo = $4, unidade_origem = $5,
+                email = $6, celular = $7, celular2 = $8, nome_mae = $9, cep = $10, cidade = $11,
+                bairro = $12, endereco = $13, tabagista = $14, etilista = $15, lesoes = $16, imagem = $17, consulta = $18
+            WHERE id = $19`,
+			nome, cartaoSUS, dataNascimento, sexo, unidadeOrigem, email, celular, celular2,
+			nomeMae, cep, cidade, bairro, endereco, tabagista, etilista, lesoes, imagem, consulta, id,
+		)
+		if err != nil {
+			http.Error(w, "Erro ao atualizar paciente: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		http.Redirect(w, r, "/templates/atualizar-sucesso-paciente.html", http.StatusSeeOther)
+	}
+}
+
 func main() {
 	//BANCO
 	// string de conexão
@@ -569,6 +671,11 @@ func main() {
 	http.HandleFunc("/dashboard-adm", requireAuth(dashboardADMHandler))
 	// ativa o cadastro
 	http.HandleFunc("/cadastro", requireAuth(cadastroHandler))
+	// para editar paciente
+	http.HandleFunc("/editar-paciente", requireAuth(editarPacienteHandler(db)))
+	// atualizar paciente
+	http.HandleFunc("/atualizar-paciente", requireAuth(atualizarPacienteHandler(db)))
+
 	// ativa o cadastro de usuários
 	http.HandleFunc("/cadastro-acs", requireAuth(cadastroAcsHandler))
 	//ativa listar paciente
