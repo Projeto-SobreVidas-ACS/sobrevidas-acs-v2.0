@@ -72,7 +72,7 @@
                     <td>{{.Bairro}}</td>
                     <td>{{.Endereco}}</td>
                     <td>{{ if eq .TipoUsuario 1 }}ACS{{ else }}ADM{{ end }}</td>
-                    <td><a href="edit">&#x270F;&#xFE0F;</a></td>
+                    <td><a href="/editar-usuario?id={{.ID}}">&#x270F;&#xFE0F;</a></td>
                 </tr>
                 {{end}}
             </tbody>

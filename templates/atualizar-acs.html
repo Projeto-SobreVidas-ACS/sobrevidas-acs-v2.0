@@ -24,29 +24,30 @@
     </header>
 
 	<main>
-        <h2 class="cadastro">Cadastro de Usuários</h2>
+        <h2 class="cadastro">Atualizar Usuário</h2>
         <p class="instru">Caso alguma dúvida no cadastro verifique dúvidas frequentes ou entre em Contato para mais informações. <br> <b>Campos com "*" são obrigatórios.</b></p>
 		<div class="formularioCadastro">
-            <form class="formulario-paciente" id="cadastroPaciente" name="cadastroPaciente" action="/cadastro-acs" method="POST">
+            <form class="formulario-paciente" id="cadastroPaciente" name="cadastroPaciente" action="/atualizar-usuario" method="POST">
                 <div class="coluna">
+                    <input type="hidden" name="id" value="{{.ID}}">
                     <!-- Nome -->
                     <label for="nome">Nome Completo: *</label>
-                    <input type="text" id="nome" name="nome" required>
+                    <input type="text" id="nome" name="nome" required value="{{.Nome}}">
               
                     <!-- CPF -->
                     <label for="cpf">CPF: *</label>
-                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required>
+                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" value="{{.CPF}}" readonly required>
                     <div class="menor1">
                         <div>
                             <!-- Data de Nascimento -->
                             <label for="dataNascimento">Data de Nascimento: *</label>
-                            <input type="date" id="dataNascimento" name="dataNascimento" required>
+                            <input type="date" id="dataNascimento" name="dataNascimento" value="{{ .DataNascimento }}" required>
                         </div>
                         <div>
                             <!-- Sexo -->
                             <label for="sexo">Sexo: *</label>
                             <select id="sexo" name="sexo" required>
-                                <option value="" disabled selected>Selecione</option>
+                                <option value="{{.Sexo}}" disabled selected>{{.Sexo}}</option>
                                 <option value="feminino">Feminino</option>
                                 <option value="masculino">Masculino</option>
                                 <option value="outro">Outro</option>
@@ -55,12 +56,12 @@
                     </div>
                     <!-- Nome da Mãe -->
                     <label for="nomeMae">Nome da Mãe: *</label>
-                    <input type="text" id="nomeMae" name="nomeMae" required>
+                    <input type="text" id="nomeMae" name="nomeMae" value="{{.NomeMae}}" required>
 
                     <!-- Tipo -->
                     <label for="tipo">Tipo: *</label>
                     <select class="tipo" classe="menor1" id="tipo" name="tipo" required>
-                        <option value="" disabled selected>Selecione</option>
+                        <option value="{{.TipoUsuario}}" disabled selected>{{ if eq .TipoUsuario 1 }}ACS{{ else }}ADM{{ end }}</option>
                         <option value="1">Agente Comunitário de Saúde - ACS</option>
                         <option value="2">Administrador</option>
                     </select>
@@ -68,60 +69,60 @@
               
                     <!-- Email (Opcional) -->
                     <label for="email">Email: (opcional)</label>
-                    <input type="email" id="email" name="email" placeholder="exemplo@dominio.com">
+                    <input type="email" id="email" name="email" placeholder="exemplo@dominio.com" value="{{.Email}}">
 
-                    <label for="password">Definir senha:</label>
-                    <input type="password" id="password" name="password" required>
+                    <label for="password">Redefinir senha:</label>
+                    <input type="password" id="password" name="password" value="{{.Senha}}" required>
                 </div>
                 <div class="coluna">
 
                     <!-- CBO -->
                     <label for="cbo">CBO: *</label>
-                    <input type="text" id="cbo" name="cbo" required>
+                    <input type="text" id="cbo" name="cbo" value="{{.CBO}}" required>
                     
                     <div class="menor">
                         <div>
                             <!-- INE -->
                             <label for="ine">INE: *</label>
-                            <input type="text" id="ine" name="ine"  required>
+                            <input type="text" id="ine" name="ine"  value="{{.INE}}" required>
                         </div>
                         <div>
                             <!-- CNES -->
                             <label for="cnes">CNES: *</label>
-                            <input type="text" id="cnes" name="cnes" required>
+                            <input type="text" id="cnes" name="cnes"  value="{{.CNES}}" required>
                         </div>
                         <div>
                             <!-- Telefone 1 -->
                             <label for="telefone1">Telefone 1: *</label>
-                            <input type="tel" id="telefone1" name="telefone1" placeholder="(00) 00000-0000" required>
+                            <input type="tel" id="telefone1" name="telefone1" placeholder="(00) 00000-0000" value="{{.Celular}}" required>
                         </div>
                         <div>
                             <!-- Telefone 2 (Opcional) -->
                             <label for="telefone2">Telefone 2 (Opcional):</label>
-                            <input type="tel" id="telefone2" name="telefone2" placeholder="(00) 00000-0000">
+                            <input type="tel" id="telefone2" name="telefone2" placeholder="(00) 00000-0000" value="{{.Celular2}}">
                         </div>
                         <div>
                             <!-- CEP -->
                             <label for="cep">CEP: *</label>
-                            <input type="text" id="cep" name="cep" placeholder="00000-000" required>
+                            <input type="text" id="cep" name="cep" placeholder="00000-000" value="{{.CEP}}" required>
                         </div>
                           
                         <div>
                             <!-- Cidade -->
                             <label for="cidade">Cidade: *</label>
-                            <input type="text" id="cidade" name="cidade" required>
+                            <input type="text" id="cidade" name="cidade" value="{{.Cidade}}" required>
                         </div>
                           
                         <div>
                             <!-- Bairro -->
                             <label for="bairro">Bairro: *</label>
-                            <input type="text" id="bairro" name="bairro" required>
+                            <input type="text" id="bairro" name="bairro" value="{{.Bairro}}" required>
                         </div>
                           
                         <div>
                             <!-- Endereço Completo (Opcional) -->
                             <label for="enderecoCompleto">Complemento(Opcional):</label>
-                            <input type="text" id="enderecoCompleto" name="enderecoCompleto">
+                            <input type="text" id="enderecoCompleto" name="enderecoCompleto" value="{{.Endereco}}">
                         </div>
                         
                         <div class="botoes" >

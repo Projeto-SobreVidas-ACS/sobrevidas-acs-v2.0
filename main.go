@@ -672,6 +672,93 @@ func atualizarPacienteHandler(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+func editarUsuarioHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := r.URL.Query().Get("id")
+
+		var usuario Usuario
+
+		err := db.QueryRow("SELECT id, nome, cpf, cbo, ine, cnes, data_nascimento, sexo, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tipo_usuario FROM usuario WHERE id = $1", id).Scan(
+			&usuario.ID, &usuario.Nome, &usuario.CPF, &usuario.CBO, &usuario.INE, &usuario.CNES, &usuario.DataNascimento, &usuario.Sexo,
+			&usuario.Email, &usuario.Celular, &usuario.Celular2, &usuario.NomeMae, &usuario.CEP, &usuario.Cidade, &usuario.Bairro,
+			&usuario.Endereco, &usuario.TipoUsuario)
+
+		if err != nil {
+			http.Error(w, "Usuario não encontrado", http.StatusNotFound)
+			return
+		}
+
+		parsedTime, err := time.Parse(time.RFC3339, usuario.DataNascimento)
+		if err != nil {
+			http.Error(w, "Erro ao fazer parse da data", http.StatusInternalServerError)
+			return
+		}
+
+		DataFormat := parsedTime.Format("2006-01-02")
+		usuario.DataNascimento = DataFormat
+
+		tmpl, err := template.ParseFiles("templates/atualizar-acs.html")
+		log.Print(usuario.DataNascimento)
+		if err != nil {
+			http.Error(w, "Erro ao carregar o template", http.StatusInternalServerError)
+			return
+		}
+
+		tmpl.Execute(w, usuario)
+	}
+}
+
+func atualizarUsuarioHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
+			return
+		}
+		err := r.ParseForm()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		id := r.FormValue("id")
+		nome := r.FormValue("nome")
+		senha := r.FormValue("password")
+
+		cbo := r.FormValue("cbo")
+		ine := r.FormValue("ine")
+		cnes := r.FormValue("cnes")
+		dataNascimento := r.FormValue("dataNascimento")
+		sexo := r.FormValue("sexo")
+		email := r.FormValue("email")
+		celular := r.FormValue("telefone1")
+		celular2 := r.FormValue("telefone2")
+		nomeMae := r.FormValue("nomeMae")
+		cep := r.FormValue("cep")
+		cidade := r.FormValue("cidade")
+		bairro := r.FormValue("bairro")
+		endereco := r.FormValue("enderecoCompleto")
+		tipoUsuario := r.FormValue("tipo")
+
+		log.Print(dataNascimento)
+
+		_, err = db.Exec(`
+            UPDATE usuario
+            SET nome = $1, senha = $2, data_nascimento = $3, sexo = $4, tipo_usuario = $5,
+                email = $6, celular = $7, celular2 = $8, nome_mae = $9, cep = $10, cidade = $11,
+                bairro = $12, endereco = $13, cbo = $14, ine = $15, cnes = $16
+            WHERE id = $17`,
+			nome, senha, dataNascimento, sexo, tipoUsuario, email, celular, celular2,
+			nomeMae, cep, cidade, bairro, endereco, cbo, ine, cnes, id,
+		)
+		if err != nil {
+			http.Error(w, "Erro ao atualizar paciente: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		http.Redirect(w, r, "/templates/atualizar-sucesso-usuario.html", http.StatusSeeOther)
+	}
+}
+
 func main() {
 	//BANCO
 	// string de conexão
@@ -713,6 +800,11 @@ func main() {
 	http.HandleFunc("/editar-paciente", requireAuth(editarPacienteHandler(db)))
 	// atualizar paciente
 	http.HandleFunc("/atualizar-paciente", requireAuth(atualizarPacienteHandler(db)))
+
+	// para editar usuario
+	http.HandleFunc("/editar-usuario", requireAuth(editarUsuarioHandler(db)))
+	// atualizar usuario
+	http.HandleFunc("/atualizar-usuario", requireAuth(atualizarUsuarioHandler(db)))
 
 	// ativa o cadastro de usuários
 	http.HandleFunc("/cadastro-acs", requireAuth(cadastroAcsHandler))
