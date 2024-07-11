@@ -36,15 +36,22 @@
                 <tr>
                     <th class="name">Nome</th>
                     <th>CPF</th>
+                    <th>Cartão do SUS</th>
                     <th>Data de Nascimento</th>
                     <th>Sexo</th>
+                    <th>Unidade de Origem</th>
+                    <th>E-mail</th>
+                    <th>Celular</th>
+                    <th>Celular 2</th>
+                    <th>Nome da Mãe</th>
+                    <th>CEP</th>
                     <th>Cidade</th>
                     <th>Bairro</th>
+                    <th>Endereço</th>
                     <th>Tabagista</th>
                     <th>Etilista</th>
                     <th>Lesões</th>
                     <th>Consulta</th>
-                    <th>&#x1F5C2;&#xFE0F;</th>
                     <th>&#x1F4DD;</th>
                 </tr>
             </thead>
@@ -53,15 +60,22 @@
                 <tr>
                     <td class="name">{{.Nome}}</td>
                     <td>{{.CPF}}</td>
+                    <td>{{.CartaoSUS}}</td>
                     <td>{{.DataNascimento}}</td>
                     <td>{{.Sexo}}</td>
+                    <td>{{.UnidadeOrigem}}</td>
+                    <td>{{.Email}}</td>
+                    <td>{{.Celular1}}</td>
+                    <td>{{.Celular2}}</td>
+                    <td>{{.NomeMae}}</td>
+                    <td>{{.CEP}}</td>
                     <td>{{.Cidade}}</td>
                     <td>{{.Bairro}}</td>
+                    <td>{{.Endereco}}</td>
                     <td>{{if .Tabagista}}✅{{else}}❌{{end}}</td>
                     <td>{{if .Etilista}}✅{{else}}❌{{end}}</td>
                     <td>{{if .Lesoes}}✅{{else}}❌{{end}}</td>
                     <td>{{if .Consulta}}✅{{else}}❌{{end}}</td>
-                    <td><a href="visu">&#x1F441;&#xFE0F;</a></td>
                     <td><a href="/editar-paciente?id={{.ID}}">&#x270F;&#xFE0F;</a></td>
                 </tr>
                 {{end}}

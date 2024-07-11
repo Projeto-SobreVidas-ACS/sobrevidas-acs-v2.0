@@ -74,6 +74,49 @@ main {
     padding-top: 50px;
 }
 
+
+.busca{
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 18px;
+    border-radius: 6px;
+    background-color:#e4eceb;
+    height: 55px;
+    padding: 5px 5px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    align-items: center;
+    justify-content: center;
+}
+.busca label {
+    font-size: 1em;
+    padding: 0px 5px;
+    color: #1d2830;
+}
+.busca button {
+    margin: 0px 5px;
+    height: 40px;
+}
+.busca button img {
+    height: 40px;
+}
+.busca input {
+    width: 170px;
+    font-size: 18px;
+    appearance: none;
+    border-radius: 6px;
+    height: 45px;
+    overflow: hidden;
+    border: none;
+    outline: none;
+    padding: 0px 20px;
+    color: #1d2830;
+    
+}
+
+
+
+
 .cadastro {
     color: #fdfdfd;
     font-size: 36px;

@@ -26,6 +26,11 @@
 	<main>
         <h2 class="cadastro">Cadastro de Paciente</h2>
         <p class="instru">Caso alguma dúvida no cadastro do paciente verifique dúvidas frequentes ou entre em Contato para mais informações.</p>
+        <form class="busca" action="/paciente-existente" method="post">
+            <label for="identificar-cpf">Buscar por CPF:</label>
+            <input type="text" id="identificar-cpf" name="identificar-cpf">
+            <button type="submit"><img src="../public/assets/images/lupa.png" alt=""></button>
+        </form>
 		<div class="formularioCadastro">
             <form class="formulario-paciente" id="cadastroPaciente" name="cadastroPaciente" action="/cadastro" method="POST" enctype="multipart/form-data">
                 <div class="coluna">

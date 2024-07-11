@@ -408,6 +408,43 @@ func getPacienteByCPF(db *sql.DB, cpf string) ([]Paciente, error) {
 	return paciente1, nil
 }
 
+func getPacienteIDByCPF(db *sql.DB, cpf string) (int, error) {
+	var id int
+	query := "SELECT id FROM paciente WHERE cpf = $1"
+	err := db.QueryRow(query, cpf).Scan(&id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Printf("Paciente com CPF %s não encontrado", cpf)
+			return 0, nil
+		}
+		return 0, err
+	}
+	return id, nil
+}
+
+func identificarEAtualizarHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
+			return
+		}
+
+		cpf := r.FormValue("identificar-cpf")
+		if cpf == "" {
+			http.Error(w, "CPF é obrigatório", http.StatusBadRequest)
+			return
+		}
+
+		id, err := getPacienteIDByCPF(db, cpf)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		http.Redirect(w, r, fmt.Sprintf("/editar-paciente?id=%d", id), http.StatusSeeOther)
+	}
+}
+
 func getPacientes(db *sql.DB) ([]Paciente, error) {
 	query := `
         SELECT id, nome, cpf, cartao_sus, data_nascimento, sexo, unidade_origem, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tabagista, etilista, lesoes, imagem, consulta 
@@ -438,7 +475,6 @@ func getPacientes(db *sql.DB) ([]Paciente, error) {
 
 func listarPacientesHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Verificar se um CPF foi fornecido na query string
 		cpf := r.FormValue("buscar-cpf")
 		if cpf != "" {
 			paciente, err := getPacienteByCPF(db, cpf)
@@ -515,7 +551,7 @@ func getUsuarios(db *sql.DB) ([]Usuario, error) {
 
 func listarUsuariosHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Verificar se um CPF foi fornecido na query string
+		// verifica se tem cpf procurando
 		cpf := r.FormValue("buscar-cpf-user")
 		if cpf != "" {
 			usuario, err := getUsuarioByCPF(db, cpf)
@@ -553,14 +589,12 @@ func editarPacienteHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Parse da string para um objeto time.Time
 		parsedTime, err := time.Parse(time.RFC3339, paciente.DataNascimento)
 		if err != nil {
 			http.Error(w, "Erro ao fazer parse da data", http.StatusInternalServerError)
 			return
 		}
 
-		// Formata a data no formato YYYY-MM-DD
 		DataFormat := parsedTime.Format("2006-01-02")
 		paciente.DataNascimento = DataFormat
 
@@ -669,8 +703,12 @@ func main() {
 
 	http.HandleFunc("/dashboard-acs", requireAuth(dashboardACSHandler))
 	http.HandleFunc("/dashboard-adm", requireAuth(dashboardADMHandler))
+
 	// ativa o cadastro
 	http.HandleFunc("/cadastro", requireAuth(cadastroHandler))
+	// identificar e atualizar usuário
+	http.HandleFunc("/paciente-existente", requireAuth(identificarEAtualizarHandler(db)))
+
 	// para editar paciente
 	http.HandleFunc("/editar-paciente", requireAuth(editarPacienteHandler(db)))
 	// atualizar paciente

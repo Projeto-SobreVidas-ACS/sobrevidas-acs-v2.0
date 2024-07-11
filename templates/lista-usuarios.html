@@ -41,10 +41,15 @@
                     <th>CNES</th>
                     <th>Data de Nascimento</th>
                     <th>Sexo</th>
+                    <th>E-mail</th>
+                    <th>Celular</th>
+                    <th>Celular 2</th>
+                    <th>Nome da Mãe</th>
+                    <th>CEP</th>
                     <th>Cidade</th>
                     <th>Bairro</th>
+                    <th>Endereço</th>
                     <th>Tipo de Usuário</th>
-                    <th>&#x1F5C2;&#xFE0F;</th>
                     <th>&#x1F4DD;</th>
                 </tr>
             </thead>
@@ -58,10 +63,15 @@
                     <td>{{.CNES}}</td>
                     <td>{{.DataNascimento}}</td>
                     <td>{{.Sexo}}</td>
+                    <td>{{.Email}}</td>
+                    <td>{{.Celular}}</td>
+                    <td>{{.Celular2}}</td>
+                    <td>{{.NomeMae}}</td>
+                    <td>{{.CEP}}</td>
                     <td>{{.Cidade}}</td>
                     <td>{{.Bairro}}</td>
+                    <td>{{.Endereco}}</td>
                     <td>{{ if eq .TipoUsuario 1 }}ACS{{ else }}ADM{{ end }}</td>
-                    <td><a href="visu">&#x1F441;&#xFE0F;</a></td>
                     <td><a href="edit">&#x270F;&#xFE0F;</a></td>
                 </tr>
                 {{end}}
