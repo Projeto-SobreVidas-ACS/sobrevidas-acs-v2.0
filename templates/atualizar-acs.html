@@ -29,7 +29,7 @@
 		<div class="formularioCadastro">
             <form class="formulario-paciente" id="cadastroPaciente" name="cadastroPaciente" action="/atualizar-usuario" method="POST">
                 <div class="coluna">
-                    <input type="hidden" name="id" value="{{.ID}}">
+                    <input type="hidden" name="id" id="nome" value="{{.ID}}">
                     <!-- Nome -->
                     <label for="nome">Nome Completo: *</label>
                     <input type="text" id="nome" name="nome" required value="{{.Nome}}">
@@ -61,9 +61,9 @@
                     <!-- Tipo -->
                     <label for="tipo">Tipo: *</label>
                     <select class="tipo" classe="menor1" id="tipo" name="tipo" required>
-                        <option value="{{.TipoUsuario}}" disabled selected>{{ if eq .TipoUsuario 1 }}ACS{{ else }}ADM{{ end }}</option>
-                        <option value="1">Agente Comunitário de Saúde - ACS</option>
-                        <option value="2">Administrador</option>
+                        <option value="" disabled>Selecione</option>
+                        <option value="1" {{ if eq .TipoUsuario 1 }}selected{{ end }}>Agente Comunitário de Saúde - ACS</option>
+                        <option value="2" {{ if eq .TipoUsuario 1 }}selected{{ end }}>Administrador</option>
                     </select>
 
               
@@ -128,7 +128,7 @@
                         <div class="botoes" >
                             <!-- Botão de Submit -->
                             <a class="botaovoltar" href="dashboard-adm.html">Cancelar</a>
-                            <button type="submit">Cadastrar</button>
+                            <button type="submit">Atualizar</button>
                             
                         </div>
                     </div>

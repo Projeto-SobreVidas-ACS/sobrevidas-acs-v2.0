@@ -678,8 +678,8 @@ func editarUsuarioHandler(db *sql.DB) http.HandlerFunc {
 
 		var usuario Usuario
 
-		err := db.QueryRow("SELECT id, nome, cpf, cbo, ine, cnes, data_nascimento, sexo, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tipo_usuario FROM usuario WHERE id = $1", id).Scan(
-			&usuario.ID, &usuario.Nome, &usuario.CPF, &usuario.CBO, &usuario.INE, &usuario.CNES, &usuario.DataNascimento, &usuario.Sexo,
+		err := db.QueryRow("SELECT id, nome, senha, cpf, cbo, ine, cnes, data_nascimento, sexo, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tipo_usuario FROM usuario WHERE id = $1", id).Scan(
+			&usuario.ID, &usuario.Nome, &usuario.Senha, &usuario.CPF, &usuario.CBO, &usuario.INE, &usuario.CNES, &usuario.DataNascimento, &usuario.Sexo,
 			&usuario.Email, &usuario.Celular, &usuario.Celular2, &usuario.NomeMae, &usuario.CEP, &usuario.Cidade, &usuario.Bairro,
 			&usuario.Endereco, &usuario.TipoUsuario)
 
@@ -710,7 +710,7 @@ func editarUsuarioHandler(db *sql.DB) http.HandlerFunc {
 
 func atualizarUsuarioHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
+		if r.Method != "POST" {
 			http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
 			return
 		}
@@ -737,8 +737,15 @@ func atualizarUsuarioHandler(db *sql.DB) http.HandlerFunc {
 		cidade := r.FormValue("cidade")
 		bairro := r.FormValue("bairro")
 		endereco := r.FormValue("enderecoCompleto")
-		tipoUsuario := r.FormValue("tipo")
 
+		tipoUsuarioStr := r.FormValue("tipo")
+		tipoUsuario, err := strconv.Atoi(tipoUsuarioStr)
+		if err != nil {
+			http.Error(w, "Tipo de usuário inválido", http.StatusBadRequest)
+			return
+		}
+
+		log.Printf("ID: %s, TipoUsuario: %d", id, tipoUsuario)
 		log.Print(dataNascimento)
 
 		_, err = db.Exec(`
