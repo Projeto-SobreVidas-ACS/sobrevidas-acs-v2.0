@@ -792,6 +792,8 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/index", http.StatusSeeOther)
 }
 
+//filtros
+
 func main() {
 	//BANCO
 	// string de conexão
