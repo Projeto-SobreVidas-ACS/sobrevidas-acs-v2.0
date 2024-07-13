@@ -4,6 +4,13 @@
 
 # SobreVidas ACS
 ### Uma aplicação para o monitoramento do cancer de boca por agentes comunitários da saúde.
+- Cadastro de pacientes na plataforma;
+- Listagem e filtros com as condições de risco;
+- Opção de consulta mais acessível para os sistemas não padronizados das unidades de saúde;
+- Design Moderno e Intuitivo;
+- Totalmente Responsiva;
+
+
 
 ## Vídeo com detalhes da implementação e integração com o banco de dados:
 link: https://drive.google.com/file/d/1t-HSaptt8p2BZc1BcDu5XczCQl3Wpwnx/view?usp=drive_link
@@ -72,6 +79,8 @@ CREATE TABLE usuario (
 - Banco de dados configurado!
 - No terminal, execute o comando go run main.go no repositório;
 - Após o log "Conexão bem-sucedida!" acesse a aplicação por http://localhost:8080 no navegador.
+
+
 
 ## Ferramentas Utilizadas
 
