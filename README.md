@@ -1,3 +1,5 @@
+![Logo da Minha Aplicação](public/assets/images/icone.png)
+
 # Project Title
 
 One Paragraph of project description goes here
