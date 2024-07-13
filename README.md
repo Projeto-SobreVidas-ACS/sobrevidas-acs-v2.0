@@ -7,16 +7,17 @@
 - Cadastro de pacientes na plataforma;
 - Listagem e filtros com as condições de risco;
 - Opção de consulta mais acessível para os sistemas não padronizados das unidades de saúde;
+- Perfil para os ACS’s;
 - Design Moderno e Intuitivo;
-- Totalmente Responsiva;
+- Totalmente Responsivo;
 
-
+<br>
 
 ## Vídeo com detalhes da implementação e integração com o banco de dados:
 link: https://drive.google.com/file/d/1t-HSaptt8p2BZc1BcDu5XczCQl3Wpwnx/view?usp=drive_link
 ## Vídeo do picth:
 link: https://www.youtube.com/watch?v=eWTbHU7e1lM
-
+<br>
 ## Instalação:
 - Com a linguagem go instalada clone esse repositório;
 - Instale PostgreSQL e o pgAdmin 4 e coloque essas configurações:
@@ -80,7 +81,7 @@ CREATE TABLE usuario (
 - No terminal, execute o comando go run main.go no repositório;
 - Após o log "Conexão bem-sucedida!" acesse a aplicação por http://localhost:8080 no navegador.
 
-
+<br>
 
 ## Ferramentas Utilizadas
 
