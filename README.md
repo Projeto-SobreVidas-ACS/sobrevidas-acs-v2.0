@@ -6,9 +6,9 @@
 ### Uma aplicação para o monitoramento do cancer de boca por agentes comunitários da saúde.
 
 ## Vídeo com detalhes da implementação e integração com o banco de dados:
-link: 
+link: https://drive.google.com/file/d/1t-HSaptt8p2BZc1BcDu5XczCQl3Wpwnx/view?usp=drive_link
 ## Vídeo do picth:
-link: 
+link: https://www.youtube.com/watch?v=eWTbHU7e1lM
 
 ## Instalação:
 - Com a linguagem go instalada clone esse repositório;
