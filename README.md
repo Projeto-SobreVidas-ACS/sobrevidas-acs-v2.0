@@ -17,7 +17,9 @@
 link: https://drive.google.com/file/d/1t-HSaptt8p2BZc1BcDu5XczCQl3Wpwnx/view?usp=drive_link
 ## Vídeo do picth:
 link: https://www.youtube.com/watch?v=eWTbHU7e1lM
+
 <br>
+
 ## Instalação:
 - Com a linguagem go instalada clone esse repositório;
 - Instale PostgreSQL e o pgAdmin 4 e coloque essas configurações:
