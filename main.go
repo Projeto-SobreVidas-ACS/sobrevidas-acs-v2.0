@@ -102,24 +102,24 @@ func requireAuth(handler http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func authenticateUser(db *sql.DB, cpf string, password string) (bool, int, error) {
+func authenticateUser(db *sql.DB, cpf string, password string) (bool, int, int, error) {
 	var storedPassword string
-	var userType int
+	var userType, userID int
 
-	query := "SELECT senha, tipo_usuario FROM usuario WHERE cpf = $1"
-	err := db.QueryRow(query, cpf).Scan(&storedPassword, &userType)
+	query := "SELECT senha, tipo_usuario, id FROM usuario WHERE cpf = $1"
+	err := db.QueryRow(query, cpf).Scan(&storedPassword, &userType, &userID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return false, 0, nil
+			return false, 0, 0, nil
 		}
-		return false, 0, err
+		return false, 0, 0, err
 	}
 
 	if password != storedPassword {
-		return false, 0, nil
+		return false, 0, 0, nil
 	}
 
-	return true, userType, nil
+	return true, userType, userID, nil
 }
 
 func loginHandler(db *sql.DB) http.HandlerFunc {
@@ -133,7 +133,7 @@ func loginHandler(db *sql.DB) http.HandlerFunc {
 			cpf := r.FormValue("username")
 			password := r.FormValue("password")
 
-			authenticated, userType, err := authenticateUser(db, cpf, password)
+			authenticated, userType, userID, err := authenticateUser(db, cpf, password)
 			if err != nil {
 				http.Error(w, "Erro interno do servidor", http.StatusInternalServerError)
 				return
@@ -143,6 +143,7 @@ func loginHandler(db *sql.DB) http.HandlerFunc {
 				session, _ := store.Get(r, "session-name")
 				session.Values["authenticated"] = true
 				session.Values["userType"] = userType
+				session.Values["userID"] = userID
 				session.Save(r, w)
 
 				switch userType {
@@ -153,12 +154,13 @@ func loginHandler(db *sql.DB) http.HandlerFunc {
 				default:
 					http.Error(w, "CPF ou senha incorretos", http.StatusUnauthorized)
 				}
+			} else {
+				http.Error(w, "CPF ou senha incorretos", http.StatusUnauthorized)
 			}
 		}
 	}
 }
-
-func dashboardACSHandler(w http.ResponseWriter, r *http.Request) {
+func backHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "session-name")
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
 		http.Error(w, "Acesso não autorizado", http.StatusUnauthorized)
@@ -166,55 +168,19 @@ func dashboardACSHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userType := session.Values["userType"]
-	if userType != 1 {
-		http.Error(w, "Acesso não autorizado", http.StatusUnauthorized)
+	url := r.URL.Path
+
+	if userType == 1 {
+		http.Redirect(w, r, "/templates/dashboard-acs.html", http.StatusSeeOther)
+		return
+	}
+	if userType == 2 {
+		http.Redirect(w, r, "/templates/dashboard-adm.html", http.StatusSeeOther)
 		return
 	}
 
-	switch r.URL.Path {
-	case "/dashboard-adm":
-		renderTemplate(w, "templates/dashboard-acs.html")
-	case "/cadastrar-paciente":
-		renderTemplate(w, "templates/cadastrar-paciente.html")
-	case "/cadastro-sucesso-paciente":
-		renderTemplate(w, "templates/cadastro-sucesso-paciente.html")
-	case "/perfil-usuario":
-		renderTemplate(w, "templates/perfil-usuario.html")
-	case "/atualizar-paciente":
-		renderTemplate(w, "templates/atualizar-paciente.html")
-	case "/atualizar-perfil":
-		renderTemplate(w, "templates/atualizar-perfil.html")
-	case "/atualizado-sucesso-paciente":
-		renderTemplate(w, "templates/atualizado-sucesso-paciente.html")
-	case "/atualizado-sucesso-perfil":
-		renderTemplate(w, "templates/atualizado-sucesso-perfil.html")
-	case "/lista-consultas":
-		renderTemplate(w, "templates/lista-consultas.html")
-	case "/duvidas-frequentes":
-		renderTemplate(w, "templates/duvidas-frequentes.html")
-	case "/lista-pacientes":
-		renderTemplate(w, "templates/lista-pacientes.html")
-	case "/outra":
-		renderTemplate(w, "templates/outra.html")
-	default:
-		http.NotFound(w, r)
-	}
-}
-
-func dashboardADMHandler(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "session-name")
-	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		http.Error(w, "Acesso não autorizado", http.StatusUnauthorized)
-		return
-	}
-
-	userType := session.Values["userType"]
-	if userType != 2 {
-		http.Error(w, "Acesso não autorizado", http.StatusUnauthorized)
-		return
-	}
-
-	renderTemplate(w, r.URL.Path)
+	// Caso passe na verificação de tipo de usuário, renderiza a página solicitada
+	renderTemplate(w, url)
 }
 
 func cadastroHandler(w http.ResponseWriter, r *http.Request) {
@@ -765,6 +731,66 @@ func atualizarUsuarioHandler(db *sql.DB) http.HandlerFunc {
 		http.Redirect(w, r, "/templates/atualizar-sucesso-usuario.html", http.StatusSeeOther)
 	}
 }
+func getUsuarioByID(db *sql.DB, id int) (Usuario, error) {
+	query := `
+        SELECT id, nome, cpf, cbo, ine, cnes, data_nascimento, sexo, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tipo_usuario 
+		FROM usuario
+        WHERE id = $1 AND inativo = false
+    `
+	var u Usuario
+	err := db.QueryRow(query, id).Scan(&u.ID, &u.Nome, &u.CPF, &u.CBO, &u.INE, &u.CNES, &u.DataNascimento, &u.Sexo,
+		&u.Email, &u.Celular, &u.Celular2, &u.NomeMae, &u.CEP, &u.Cidade, &u.Bairro,
+		&u.Endereco, &u.TipoUsuario)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return u, nil
+		}
+		return u, err
+	}
+	parsedTime, err := time.Parse(time.RFC3339, u.DataNascimento)
+	if err != nil {
+		return u, fmt.Errorf("erro ao fazer parse da data: %v", err)
+	}
+
+	u.DataNascimento = parsedTime.Format("2006-01-02")
+
+	return u, nil
+}
+func perfilHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "session-name")
+		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+			http.Error(w, "Acesso não autorizado", http.StatusUnauthorized)
+			return
+		}
+
+		userID, ok := session.Values["userID"].(int)
+		if !ok {
+			http.Error(w, "ID do usuário não encontrado na sessão", http.StatusInternalServerError)
+			return
+		}
+
+		usuario, err := getUsuarioByID(db, userID)
+		if err != nil {
+			http.Error(w, "Erro ao buscar dados do usuário", http.StatusInternalServerError)
+			return
+		}
+
+		renderTemplateWithData(w, "/atualizar-perfil.html", usuario)
+	}
+}
+
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "session-name")
+	// Remove os dados da sessão
+	session.Values["authenticated"] = false
+	session.Values["userType"] = nil
+	session.Save(r, w)
+
+	// Redireciona para a página inicial ou de login
+	http.Redirect(w, r, "/index", http.StatusSeeOther)
+}
 
 func main() {
 	//BANCO
@@ -794,9 +820,7 @@ func main() {
 	http.HandleFunc("/", homeHandler)
 	// ativa a função de login
 	http.HandleFunc("/login", loginHandler(db))
-
-	http.HandleFunc("/dashboard-acs", requireAuth(dashboardACSHandler))
-	http.HandleFunc("/dashboard-adm", requireAuth(dashboardADMHandler))
+	http.HandleFunc("/logout", logoutHandler)
 
 	// ativa o cadastro
 	http.HandleFunc("/cadastro", requireAuth(cadastroHandler))
@@ -812,12 +836,16 @@ func main() {
 	http.HandleFunc("/editar-usuario", requireAuth(editarUsuarioHandler(db)))
 	// atualizar usuario
 	http.HandleFunc("/atualizar-usuario", requireAuth(atualizarUsuarioHandler(db)))
+	http.HandleFunc("/perfil-usuario", requireAuth(perfilHandler(db)))
 
 	// ativa o cadastro de usuários
 	http.HandleFunc("/cadastro-acs", requireAuth(cadastroAcsHandler))
 	//ativa listar paciente
 	http.HandleFunc("/lista-pacientes", requireAuth(listarPacientesHandler(db)))
 	http.HandleFunc("/lista-usuarios", requireAuth(listarUsuariosHandler(db)))
+
+	//direciona para voltar
+	http.HandleFunc("/voltar", requireAuth(backHandler))
 
 	// inicia o servidor na porta 8080
 	http.ListenAndServe(":8080", nil)

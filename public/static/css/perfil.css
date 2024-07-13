@@ -74,7 +74,19 @@ main {
     padding-top: 50px;
 }
 
-
+.voltar {
+    width: 120px;
+    font-size: 20px;
+    height: fit-content;
+    align-self: start;
+    margin-left: -16px;
+    padding: 5px 8px 5px 26px;
+    background-color: #5BADA0;
+    font-weight: 600;
+    color: #fff;
+    border-radius: 16px;
+    text-align:center;
+}
 .cadastro {
     color: #566F6B;
     font-size: 36px;
