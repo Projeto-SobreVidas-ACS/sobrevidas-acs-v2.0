@@ -179,7 +179,6 @@ func backHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Caso passe na verificação de tipo de usuário, renderiza a página solicitada
 	renderTemplate(w, url)
 }
 
@@ -783,16 +782,67 @@ func perfilHandler(db *sql.DB) http.HandlerFunc {
 
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "session-name")
-	// Remove os dados da sessão
+
 	session.Values["authenticated"] = false
 	session.Values["userType"] = nil
 	session.Save(r, w)
 
-	// Redireciona para a página inicial ou de login
 	http.Redirect(w, r, "/index", http.StatusSeeOther)
 }
 
-//filtros
+// filtros
+func getPacientesConsultas(db *sql.DB) ([]Paciente, error) {
+	query := `
+        SELECT id, nome, cpf, cartao_sus, data_nascimento, sexo, unidade_origem, email, celular, celular2, nome_mae, cep, cidade, bairro, endereco, tabagista, etilista, lesoes, imagem, consulta 
+        FROM paciente
+        WHERE inativo = false AND consulta = true
+    `
+	rows, err := db.Query(query)
+	if err != nil {
+		log.Printf("Erro ao executar consulta: %v", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var pacientes []Paciente
+	for rows.Next() {
+		var p Paciente
+		err := rows.Scan(&p.ID, &p.Nome, &p.CPF, &p.CartaoSUS, &p.DataNascimento, &p.Sexo, &p.UnidadeOrigem, &p.Email, &p.Celular1, &p.Celular2, &p.NomeMae, &p.CEP, &p.Cidade, &p.Bairro, &p.Endereco, &p.Tabagista, &p.Etilista, &p.Lesoes, &p.Imagem, &p.Consulta)
+		if err != nil {
+			log.Printf("Erro ao fazer scan dos resultados: %v", err)
+			return nil, err
+		}
+		pacientes = append(pacientes, p)
+	}
+
+	log.Printf("Número de pacientes encontrados: %d", len(pacientes))
+	return pacientes, nil
+}
+
+func listarPacientesConsultasHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cpf := r.FormValue("buscar-cpf")
+		if cpf != "" {
+			paciente, err := getPacienteByCPF(db, cpf)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			renderTemplateWithData(w, "lista-consultas.html", paciente)
+			return
+		}
+
+		// listar todos os pacientes
+		pacientes, err := getPacientesConsultas(db)
+		if err != nil {
+			log.Printf("Erro ao obter pacientes: %v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		log.Printf("Renderizando template com %d consultas", len(pacientes))
+		renderTemplateWithData(w, "lista-consultas.html", pacientes)
+	}
+}
 
 func main() {
 	//BANCO
@@ -845,6 +895,8 @@ func main() {
 	//ativa listar paciente
 	http.HandleFunc("/lista-pacientes", requireAuth(listarPacientesHandler(db)))
 	http.HandleFunc("/lista-usuarios", requireAuth(listarUsuariosHandler(db)))
+	//filtros
+	http.HandleFunc("/lista-consultas", requireAuth(listarPacientesConsultasHandler(db)))
 
 	//direciona para voltar
 	http.HandleFunc("/voltar", requireAuth(backHandler))

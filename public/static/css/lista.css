@@ -151,7 +151,7 @@ table, th, td {
     border: 1px solid #394744;
 }
 .name {
-    width: 150px;
+    min-width: 300px;
 }
 th, td {
     padding: 8px 11px;
