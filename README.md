@@ -1,4 +1,6 @@
-![Logo da Minha Aplicação](public/assets/images/icone.png)
+<p align="center">
+  <img src="public/assets/images/icone.png" alt="Descrição da imagem" height="200">
+</p>
 
 # Project Title
 
